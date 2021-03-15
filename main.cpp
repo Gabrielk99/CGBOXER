@@ -7,6 +7,7 @@
 #define inc_girar 0.15
 #define inc_soca1  0.5
 #define inc_soca2  0.33
+#define max_angle_soca 115
 //Criando os as variaveis que guardam as informações necessárias de cada objeto
 Arena arena;
 Inimigo inimigo;
@@ -17,6 +18,12 @@ int keyStatus[256] ;
 int soca=0;
 //controla o braço a socar
 float initialx=0;
+//controla movimento inimigo
+bool moveI = true;
+//controla soco do inimigo
+float incSocoAcc = 0;
+int socoDirection = 0;
+bool finalizousoco = false;
 using namespace std;
 
 void renderScene(){
@@ -58,7 +65,7 @@ void mouseMotion(int x,int y){
     if(soca && jogador.returnValidSoco() ){
         float atualposition = x-initialx;
         float theta,maxangle;
-        maxangle=114.415932;
+        maxangle=max_angle_soca;
         theta = maxangle*atualposition/(largura/2); 
         if(atualposition>0 && atualposition<(largura/2)){
             jogador.socoDireito(theta,rini,cxini,cyini);
@@ -119,6 +126,93 @@ void idle(){
                         limitcima,limitbaixo,cxinimigo,cyinimigo,raioinimigo);
     }
 
+
+
+    //Movimento do inimigo
+        GLfloat cxjogador,cyjogador;
+        jogador.obtemcXcY(cxjogador,cyjogador);
+        GLfloat raiojogador;
+        jogador.obtemRaio(raiojogador);
+        GLfloat theta=0;
+        inimigo.retornaAnguloRelativoAoJogador(cxjogador,cyjogador,theta);
+        GLfloat anguloAtual = inimigo.returnAngle();
+        GLfloat angleDiference = anguloAtual-theta;
+
+        GLfloat dist = inimigo.distanceAoJogadorF(inc_anda,timeDiference,cxjogador,cyjogador,raiojogador);
+        GLfloat raioI; 
+        inimigo.obtemRaioImaginary(raioI);
+
+        if((raioI+raiojogador)<dist){
+            inimigo.defineValidSoco(false);
+            if((dist-(raioI+raiojogador))>100 || (!keyStatus[(int)('w')] && !keyStatus[(int)('s')]) ){
+                moveI = true;
+            }
+        }
+        else {
+            moveI = false;
+            inimigo.defineValidSoco(true);
+        }
+        if(moveI){
+            if(angleDiference<0){
+                if((anguloAtual+inc_giro)>angleDiference)
+                    inimigo.Gira(inc_giro,timeDiference);
+            }
+            else if(angleDiference>0){
+                if((anguloAtual-inc_giro)<angleDiference)
+                    inimigo.Gira(-inc_giro,timeDiference);
+            }
+        
+            inimigo.Move(inc_anda,timeDiference,limitesquerda,limitdireita,limitcima,limitbaixo,
+                        cxjogador,cyjogador,raiojogador);
+        }
+        //Soca Inimigo
+        if(inimigo.returnValidSoco()){
+            GLdouble largura,altura;
+            arena.obtemAlturaLargura(largura,altura);
+            float incsoco = (max_angle_soca)/(largura/2)*timeDiference*0.8;
+            
+            if(!socoDirection){
+                socoDirection = rand()%2+1;
+            }
+            switch (socoDirection)
+            {
+            case 1:
+                if(!finalizousoco && incSocoAcc<max_angle_soca){
+                    incSocoAcc+=incsoco;
+                    inimigo.socoDireito(incSocoAcc,raiojogador,cxjogador,cyjogador);
+                }
+                else if(incSocoAcc>0) {
+                    finalizousoco = true;
+                    incSocoAcc-= incsoco;
+                    inimigo.socoDireito(incSocoAcc,raiojogador,cxjogador,cyjogador);
+                }
+                else {
+                    finalizousoco=false;
+                    incSocoAcc = 0;
+                    socoDirection = rand()%2+1;
+                }
+                break;
+             case 2:
+                if(!finalizousoco && incSocoAcc>-max_angle_soca){
+                    incSocoAcc-=incsoco;
+                    inimigo.socoEsquerdo(incSocoAcc,raiojogador,cxjogador,cyjogador);
+                }
+                else if(incSocoAcc<0) {
+                    finalizousoco = true;
+                    incSocoAcc+= incsoco;
+                    inimigo.socoEsquerdo(incSocoAcc,raiojogador,cxjogador,cyjogador);
+                }
+                else {
+                    incSocoAcc = 0;
+                    socoDirection = rand()%2+1;
+                    finalizousoco=false;
+                }
+                break;
+            default:
+                break;
+            }
+        }
+  
     glutPostRedisplay();
 }
 void init(void){

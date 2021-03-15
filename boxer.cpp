@@ -13,6 +13,20 @@ void Boxer :: DesenhaCirc(GLfloat radius,GLfloat R,GLfloat G,GLfloat B){
         }
     glEnd();
 }
+void Boxer :: DesenhaCirc2(GLfloat radius,GLfloat R,GLfloat G,GLfloat B){
+    float cx,cy = 0.0;
+    int num_point = 150;
+    glColor3f(R,G,B);
+    glPointSize(5);
+    glBegin(GL_LINE_LOOP);
+        for (int i = 0 ; i < num_point; i++){
+            float theta = 2*M_PI/(float(num_point))*(float)i;
+            float x = radius*cos(theta);
+            float y = radius*sin(theta);
+            glVertex3f(cx+x,cy+y,0);
+        }
+    glEnd();
+}
 void Boxer:: DesenhaRect(GLfloat width,GLfloat height,GLfloat R,GLfloat G,GLfloat B){
     glColor3f(R,G,B);
     glBegin(GL_QUADS);
@@ -55,6 +69,7 @@ void Boxer :: DesenhaBoxer(GLfloat cx,GLfloat cy,GLfloat radius,string color,GLf
         if (!color.compare("red")){
             DesenhaCirc(radius,0.9,0.1,0.1);
         }
+        DesenhaCirc2(radiusImaginary,1.0,1.0,1.0);
     glPopMatrix();
 }
 void Boxer :: Gira(GLdouble inc,GLdouble time){
@@ -66,7 +81,7 @@ void Boxer :: Gira(GLdouble inc,GLdouble time){
     angle+=inc*M_PI/180*time;
 }
 void Boxer :: Move(GLdouble inc, GLdouble time,GLfloat limesq,GLfloat limdir,
-GLfloat cima,GLfloat baixo,GLfloat cxinimigo,GLfloat cyinimigo,GLfloat r){ 
+GLfloat cima,GLfloat baixo,GLfloat cxadv,GLfloat cyadv,GLfloat r){ 
     //reseta o soco
     resetanglebracdir();
     resetanglebracesq();
@@ -80,8 +95,8 @@ GLfloat cima,GLfloat baixo,GLfloat cxinimigo,GLfloat cyinimigo,GLfloat r){
     x_esq = cX-radiuS+incx;
     y_cima = cY+radiuS+incy;
     y_baixo = cY-radiuS+incy;
-    float  distcx =  (cX+incx)-cxinimigo;
-    float distcy = (cY+incy)-cyinimigo;
+    float  distcx =  (cX+incx)-cxadv;
+    float distcy = (cY+incy)-cyadv;
     float dist = sqrt(pow(distcx,2)+pow(distcy,2));
     if(x_dir< limdir && x_esq> limesq){
         if((r+radiusImaginary)<dist){
@@ -143,49 +158,52 @@ void Boxer:: getGlovesPosition(GLfloat &cx,GLfloat &cy,GLfloat angle1,GLfloat an
 
 }
 void Boxer::socoDireito(GLfloat inc,GLfloat raioadversario,GLfloat cx,GLfloat cy){
-   
-    // define os angulos de soco
-    anglebraco21=anglebraco21_inicial + inc;
-    anglebraco22=anglebraco22_inicial -0.75*inc;
-
     //calcula se acertou o adversário
+    
     float luvax,luvay;
-    getGlovesPosition(luvax,luvay,anglebraco21,anglebraco22,false,true);
+    getGlovesPosition(luvax,luvay,anglebraco21_inicial+inc,anglebraco22_inicial-0.75*inc,false,true);
     
     float distcx = luvax - cx;
     float distcy = luvay - cy;
 
     float dist = sqrt(pow(distcx,2)+pow(distcy,2));
     float raioluva = radiuS/3;
-    if((raioadversario+raioluva)>dist){
-        if(pontuationValid){
+    if((raioadversario+raioluva)<(dist+3)){
+        // define os angulos de soco
+        anglebraco21=anglebraco21_inicial + inc;
+        anglebraco22=anglebraco22_inicial -0.75*inc; 
+        pontuationValid=true;
+      
+    }
+    else{
+       if(pontuationValid){
             pontuation++;
             pontuationValid = false;
-            printf("pontuação %d\n",pontuation);
         }
     }
-    else pontuationValid=true;
+   
 }
 void  Boxer :: socoEsquerdo(GLfloat inc,GLfloat raioadversario,GLfloat cx,GLfloat cy){
-    //define angulo do soco
-    anglebraco11 = anglebraco11_inicial + inc;
-    anglebraco12 = anglebraco12_inicial - 0.75*inc;
 
     //calcula se acertou o adversário
     float luvax,luvay;
-    getGlovesPosition(luvax,luvay,anglebraco11,anglebraco12,true,false);
+    getGlovesPosition(luvax,luvay,anglebraco11_inicial+inc,anglebraco12_inicial-0.75*inc,true,false);
     
     float distcx = luvax - cx;
     float distcy = luvay - cy;
 
     float dist = sqrt(pow(distcx,2)+pow(distcy,2));
     float raioluva = radiuS/3;
-    if((raioadversario+raioluva)>dist){
-        if(pontuationValid){
+    if((raioadversario+raioluva)<(dist+3)){
+        pontuationValid=true;
+        //define angulo do soco
+        anglebraco11 = anglebraco11_inicial + inc;
+        anglebraco12 = anglebraco12_inicial - 0.75*inc;
+    }
+    else {
+      if(pontuationValid){
             pontuation++;
             pontuationValid = false;
-            printf("pontuação %d\n",pontuation);
         }
     }
-    else pontuationValid=true;
 }

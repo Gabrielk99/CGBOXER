@@ -31,6 +31,7 @@ class Boxer
 
 private:
     void DesenhaCirc(GLfloat radius,GLfloat R,GLfloat G,GLfloat B);
+    void DesenhaCirc2(GLfloat radius,GLfloat R,GLfloat G,GLfloat B);
     void DesenhaRect(GLfloat width,GLfloat height,GLfloat R,GLfloat G,GLfloat B);
     void DesenhaBraco(GLfloat x,GLfloat y,GLfloat width,GLfloat height,GLfloat angle1,GLfloat angle2,GLfloat radius);
     void DesenhaNariz(GLfloat x,GLfloat y,GLfloat radius);
@@ -41,7 +42,7 @@ public:
         cX = cx;
         cY = cy;
         radiuS = radius;
-        radiusImaginary = radius*2.5;
+        radiusImaginary = radius*2.25;
         valid = true;
         color = cor;
         
@@ -68,7 +69,7 @@ public:
     }
     void Gira(GLdouble inc,GLdouble time);
     void Move(GLdouble inc,GLdouble time,GLfloat limesq,GLfloat limdir,GLfloat cima,GLfloat baixo,
-                GLfloat cxinimigo,GLfloat cyinimigo,GLfloat r);
+                GLfloat cxadv,GLfloat cyadv,GLfloat r);
     void socoDireito(GLfloat inc,GLfloat raioadversario,GLfloat cx,GLfloat cy);
     void socoEsquerdo(GLfloat inc,GLfloat raioadversario,GLfloat cx,GLfloat cy);
     void resetanglebracdir();
@@ -79,6 +80,9 @@ public:
     }
     bool returnValidSoco(){
         return socoValid;
+    }
+    float returnAngle(){
+        return angle;
     }
 };
 
