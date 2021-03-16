@@ -31,7 +31,6 @@ class Boxer
 
 private:
     void DesenhaCirc(GLfloat radius,GLfloat R,GLfloat G,GLfloat B);
-    void DesenhaCirc2(GLfloat radius,GLfloat R,GLfloat G,GLfloat B);
     void DesenhaRect(GLfloat width,GLfloat height,GLfloat R,GLfloat G,GLfloat B);
     void DesenhaBraco(GLfloat x,GLfloat y,GLfloat width,GLfloat height,GLfloat angle1,GLfloat angle2,GLfloat radius);
     void DesenhaNariz(GLfloat x,GLfloat y,GLfloat radius);
@@ -83,6 +82,17 @@ public:
     }
     float returnAngle(){
         return angle;
+    }
+    void defineValid(bool validade){
+        valid = validade;
+    }
+    int returnPontuation(){
+        return pontuation;
+    }
+    void reposition(GLfloat cx,GLfloat cy){
+        cX = cx;
+        cY = cy;
+        angle =270*M_PI/180;
     }
 };
 

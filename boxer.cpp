@@ -13,20 +13,6 @@ void Boxer :: DesenhaCirc(GLfloat radius,GLfloat R,GLfloat G,GLfloat B){
         }
     glEnd();
 }
-void Boxer :: DesenhaCirc2(GLfloat radius,GLfloat R,GLfloat G,GLfloat B){
-    float cx,cy = 0.0;
-    int num_point = 150;
-    glColor3f(R,G,B);
-    glPointSize(5);
-    glBegin(GL_LINE_LOOP);
-        for (int i = 0 ; i < num_point; i++){
-            float theta = 2*M_PI/(float(num_point))*(float)i;
-            float x = radius*cos(theta);
-            float y = radius*sin(theta);
-            glVertex3f(cx+x,cy+y,0);
-        }
-    glEnd();
-}
 void Boxer:: DesenhaRect(GLfloat width,GLfloat height,GLfloat R,GLfloat G,GLfloat B){
     glColor3f(R,G,B);
     glBegin(GL_QUADS);
@@ -69,7 +55,6 @@ void Boxer :: DesenhaBoxer(GLfloat cx,GLfloat cy,GLfloat radius,string color,GLf
         if (!color.compare("red")){
             DesenhaCirc(radius,0.9,0.1,0.1);
         }
-        DesenhaCirc2(radiusImaginary,1.0,1.0,1.0);
     glPopMatrix();
 }
 void Boxer :: Gira(GLdouble inc,GLdouble time){
@@ -195,10 +180,10 @@ void  Boxer :: socoEsquerdo(GLfloat inc,GLfloat raioadversario,GLfloat cx,GLfloa
     float dist = sqrt(pow(distcx,2)+pow(distcy,2));
     float raioluva = radiuS/3;
     if((raioadversario+raioluva)<(dist+3)){
-        pontuationValid=true;
         //define angulo do soco
         anglebraco11 = anglebraco11_inicial + inc;
         anglebraco12 = anglebraco12_inicial - 0.75*inc;
+        pontuationValid=true;
     }
     else {
       if(pontuationValid){

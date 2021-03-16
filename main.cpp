@@ -13,7 +13,7 @@ Arena arena;
 Inimigo inimigo;
 Jogador jogador;
 //Status dos controles
-int keyStatus[256] ;
+int keyStatus[256];
 //Controla angulo dos socos
 int soca=0;
 //controla o braço a socar
@@ -24,8 +24,48 @@ bool moveI = true;
 float incSocoAcc = 0;
 int socoDirection = 0;
 bool finalizousoco = false;
+//controla fim de jogo
+bool fim = false;
 using namespace std;
-
+//ImprimePlacar
+static char str[1000];
+void *font = GLUT_BITMAP_9_BY_15;
+void imprimePlacar(GLfloat x,GLfloat y,GLfloat deslocy){
+    glColor3f(1,1,1);
+    char*tmpStr;
+    sprintf(str,"JogadorScore : %d",jogador.returnPontuation());
+    glRasterPos2f(x,y);
+    tmpStr=str;
+    while(*tmpStr){
+        glutBitmapCharacter(font,*tmpStr);
+        tmpStr++;
+    }
+    sprintf(str,"InimigoScore : %d",inimigo.returnPontuation());
+    glRasterPos2f(x,y-deslocy);
+    tmpStr=str;
+    while(*tmpStr){
+        glutBitmapCharacter(font,*tmpStr);
+        tmpStr++;
+    }
+}
+//Imprime Mensagem De Vitoria
+void imprimeVitoria(GLfloat x,GLfloat y,int qual,GLfloat R,GLfloat G,GLfloat B){
+ glColor3f(R,G,B);
+    char*tmpStr;
+    if(qual == 1){
+        sprintf(str,"PARABENS JOGADOR VENCEU !!!");
+    }
+    else if(qual ==2){
+        sprintf(str," QUE PENA, O INIMIGO VENCEU !!!");
+    }
+    tmpStr=str;
+    float deslocx = glutBitmapLength(font,(const unsigned char*)tmpStr)/2.0f;
+    glRasterPos2f(x-deslocx,y);
+    while(*tmpStr){
+        glutBitmapCharacter(font,*tmpStr);
+        tmpStr++;
+    }
+}
 void renderScene(){
     glClear(GL_COLOR_BUFFER_BIT);
     if(arena.validArena())
@@ -37,7 +77,23 @@ void renderScene(){
         GLfloat cxjogador,cyjogador;
         inimigo.Desenha();
     }
-
+    GLdouble largura,altura;
+    GLfloat x,y;
+    arena.obtemAlturaLargura(largura,altura);
+    arena.ObtemOrigem(x,y);
+    imprimePlacar(x+largura/12,y+altura/12,altura/18);
+    if(fim){
+        float xposition,yposition;
+        xposition = x+largura/2;
+        yposition = y+altura*4/5;
+        //Escreve mensagem de vitoria
+        if(jogador.validBoxer()){
+            imprimeVitoria(xposition,yposition,1,1,1,1);
+        }
+        else if(inimigo.validBoxer()){
+            imprimeVitoria(xposition,yposition,2,1,1,1);
+        }
+    }
     glutSwapBuffers();
 }
 void mousePresse(int button,int state,int x,int y){
@@ -92,127 +148,153 @@ void keyUp(unsigned char key, int x,int y){
     glutPostRedisplay();
 }
 void idle(){
-    static GLdouble previousTime = glutGet(GLUT_ELAPSED_TIME);
-    GLdouble currentTime,timeDiference;
-    currentTime = glutGet(GLUT_ELAPSED_TIME);
-    timeDiference = currentTime-previousTime;
-    previousTime = currentTime;
-    double inc_giro = inc_girar;
-    double inc_anda = inc_andar;
-    GLfloat x,y;
-    GLdouble width,height;
-    arena.obtemAlturaLargura(width,height);
-    arena.ObtemOrigem(x,y);
-    float limitdireita = x+width;
-    float limitesquerda = x;
-    float limitcima = y+height;
-    float limitbaixo = y;
-    GLfloat cxinimigo,cyinimigo,raioinimigo;
-    inimigo.obtemcXcY(cxinimigo,cyinimigo);
-    inimigo.obtemRaio(raioinimigo);
-    if(keyStatus[(int)('a')]){
-        jogador.Gira(inc_giro,timeDiference);
-    }
-    if(keyStatus[(int)('d')]){
-        jogador.Gira(-inc_giro,timeDiference);
-    }
-    if(keyStatus[(int)('w')]){
-        jogador.Move(inc_anda,timeDiference,limitesquerda,limitdireita,limitcima,
-                        limitbaixo,cxinimigo,cyinimigo,raioinimigo);
+    if(!fim){
+        //Pega os parametros da arena
+        GLfloat x,y;
+        GLdouble width,height;
+        arena.obtemAlturaLargura(width,height);
+        arena.ObtemOrigem(x,y);
         
-    }
-    if(keyStatus[(int)('s')]){
-        jogador.Move(-inc_anda,timeDiference,limitesquerda,limitdireita,
-                        limitcima,limitbaixo,cxinimigo,cyinimigo,raioinimigo);
-    }
+        //Verifica pontuação
+        if(jogador.returnPontuation()==10){
+            inimigo.defineValid(false);
+            jogador.reposition(x+width/2,y+height/2);
+            inimigo.reposition(0,0);
+            jogador.resetanglebracdir();
+            jogador.resetanglebracesq();
+            fim = true;
+            
+        }
+        else if(inimigo.returnPontuation()==10){
+            jogador.defineValid(false);
+            inimigo.resetanglebracdir();
+            inimigo.resetanglebracesq();
+            inimigo.reposition(x+width/2,y+height/2);
+            jogador.reposition(0,0);
+            fim = true;
+        }
+
+        //Pega o tempo 
+        static GLdouble previousTime = glutGet(GLUT_ELAPSED_TIME);
+        GLdouble currentTime,timeDiference;
+        currentTime = glutGet(GLUT_ELAPSED_TIME);
+        timeDiference = currentTime-previousTime;
+        previousTime = currentTime;
+
+        //Realiza os movimentos do jogador
+        double inc_giro = inc_girar;
+        double inc_anda = inc_andar;
+        float limitdireita = x+width;
+        float limitesquerda = x;
+        float limitcima = y+height;
+        float limitbaixo = y;
+        GLfloat cxinimigo,cyinimigo,raioinimigo;
+        inimigo.obtemcXcY(cxinimigo,cyinimigo);
+        inimigo.obtemRaio(raioinimigo);
+        if(keyStatus[(int)('a')]){
+            jogador.Gira(inc_giro,timeDiference);
+        }
+        if(keyStatus[(int)('d')]){
+            jogador.Gira(-inc_giro,timeDiference);
+        }
+        if(keyStatus[(int)('w')]){
+            jogador.Move(inc_anda,timeDiference,limitesquerda,limitdireita,limitcima,
+                            limitbaixo,cxinimigo,cyinimigo,raioinimigo);
+            
+        }
+        if(keyStatus[(int)('s')]){
+            jogador.Move(-inc_anda,timeDiference,limitesquerda,limitdireita,
+                            limitcima,limitbaixo,cxinimigo,cyinimigo,raioinimigo);
+        }
 
 
 
-    //Movimento do inimigo
-        GLfloat cxjogador,cyjogador;
-        jogador.obtemcXcY(cxjogador,cyjogador);
-        GLfloat raiojogador;
-        jogador.obtemRaio(raiojogador);
-        GLfloat theta=0;
-        inimigo.retornaAnguloRelativoAoJogador(cxjogador,cyjogador,theta);
-        GLfloat anguloAtual = inimigo.returnAngle();
-        GLfloat angleDiference = anguloAtual-theta;
+        //Movimento do inimigo
+            GLfloat cxjogador,cyjogador;
+            jogador.obtemcXcY(cxjogador,cyjogador);
+            GLfloat raiojogador;
+            jogador.obtemRaio(raiojogador);
+            GLfloat theta=0;
+            inimigo.retornaAnguloRelativoAoJogador(cxjogador,cyjogador,theta);
+            GLfloat anguloAtual = inimigo.returnAngle();
+            GLfloat angleDiference = anguloAtual-theta;
+            GLfloat dist = inimigo.distanceAoJogadorF(inc_anda,timeDiference,cxjogador,cyjogador,raiojogador);
+            GLfloat raioI; 
+            inimigo.obtemRaioImaginary(raioI);
 
-        GLfloat dist = inimigo.distanceAoJogadorF(inc_anda,timeDiference,cxjogador,cyjogador,raiojogador);
-        GLfloat raioI; 
-        inimigo.obtemRaioImaginary(raioI);
-
-        if((raioI+raiojogador)<dist){
-            inimigo.defineValidSoco(false);
-            if((dist-(raioI+raiojogador))>100 || (!keyStatus[(int)('w')] && !keyStatus[(int)('s')]) ){
-                moveI = true;
+            if((raioI+raiojogador)<dist){
+                inimigo.defineValidSoco(false);
+                if((dist-(raioI+raiojogador))>100 || (!keyStatus[(int)('w')] && !keyStatus[(int)('s')]) ){
+                    moveI = true;
+                }
             }
-        }
-        else {
-            moveI = false;
-            inimigo.defineValidSoco(true);
-        }
-        if(moveI){
+            else {
+                moveI = false;
+                inimigo.defineValidSoco(true);
+            }
             if(angleDiference<0){
-                if((anguloAtual+inc_giro)>angleDiference)
+                if((anguloAtual+inc_giro)<theta){
                     inimigo.Gira(inc_giro,timeDiference);
+                }
             }
             else if(angleDiference>0){
-                if((anguloAtual-inc_giro)<angleDiference)
+                if((anguloAtual-inc_giro)>theta){
                     inimigo.Gira(-inc_giro,timeDiference);
-            }
-        
-            inimigo.Move(inc_anda,timeDiference,limitesquerda,limitdireita,limitcima,limitbaixo,
-                        cxjogador,cyjogador,raiojogador);
-        }
-        //Soca Inimigo
-        if(inimigo.returnValidSoco()){
-            GLdouble largura,altura;
-            arena.obtemAlturaLargura(largura,altura);
-            float incsoco = (max_angle_soca)/(largura/2)*timeDiference*0.8;
-            
-            if(!socoDirection){
-                socoDirection = rand()%2+1;
-            }
-            switch (socoDirection)
-            {
-            case 1:
-                if(!finalizousoco && incSocoAcc<max_angle_soca){
-                    incSocoAcc+=incsoco;
-                    inimigo.socoDireito(incSocoAcc,raiojogador,cxjogador,cyjogador);
                 }
-                else if(incSocoAcc>0) {
-                    finalizousoco = true;
-                    incSocoAcc-= incsoco;
-                    inimigo.socoDireito(incSocoAcc,raiojogador,cxjogador,cyjogador);
-                }
-                else {
-                    finalizousoco=false;
-                    incSocoAcc = 0;
+            }
+            //Define a memoria de theta passado
+            if(moveI){
+                inimigo.Move(inc_anda,timeDiference,limitesquerda,limitdireita,limitcima,limitbaixo,
+                            cxjogador,cyjogador,raiojogador);
+            }
+            //Soca Inimigo
+            if(inimigo.returnValidSoco()){
+                GLdouble largura,altura;
+                arena.obtemAlturaLargura(largura,altura);
+                float incsoco = (max_angle_soca)/(largura/2)*timeDiference*1.25;
+                
+                if(!socoDirection){
                     socoDirection = rand()%2+1;
                 }
-                break;
-             case 2:
-                if(!finalizousoco && incSocoAcc>-max_angle_soca){
-                    incSocoAcc-=incsoco;
-                    inimigo.socoEsquerdo(incSocoAcc,raiojogador,cxjogador,cyjogador);
+                switch (socoDirection)
+                {
+                case 1:
+                    if(!finalizousoco && incSocoAcc<max_angle_soca){
+                        incSocoAcc+=incsoco;
+                        inimigo.socoDireito(incSocoAcc,raiojogador,cxjogador,cyjogador);
+                    }
+                    else if(incSocoAcc>0) {
+                        finalizousoco = true;
+                        incSocoAcc-= incsoco;
+                        inimigo.socoDireito(incSocoAcc,raiojogador,cxjogador,cyjogador);
+                    }
+                    else {
+                        finalizousoco=false;
+                        incSocoAcc = 0;
+                        socoDirection = rand()%2+1;
+                    }
+                    break;
+                case 2:
+                    if(!finalizousoco && incSocoAcc>-max_angle_soca){
+                        incSocoAcc-=incsoco;
+                        inimigo.socoEsquerdo(incSocoAcc,raiojogador,cxjogador,cyjogador);
+                    }
+                    else if(incSocoAcc<0) {
+                        finalizousoco = true;
+                        incSocoAcc+= incsoco;
+                        inimigo.socoEsquerdo(incSocoAcc,raiojogador,cxjogador,cyjogador);
+                    }
+                    else {
+                        incSocoAcc = 0;
+                        socoDirection = rand()%2+1;
+                        finalizousoco=false;
+                    }
+                    break;
+                default:
+                    break;
                 }
-                else if(incSocoAcc<0) {
-                    finalizousoco = true;
-                    incSocoAcc+= incsoco;
-                    inimigo.socoEsquerdo(incSocoAcc,raiojogador,cxjogador,cyjogador);
-                }
-                else {
-                    incSocoAcc = 0;
-                    socoDirection = rand()%2+1;
-                    finalizousoco=false;
-                }
-                break;
-            default:
-                break;
             }
-        }
-  
+    }
     glutPostRedisplay();
 }
 void init(void){
