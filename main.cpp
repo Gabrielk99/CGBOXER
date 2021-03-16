@@ -20,6 +20,7 @@ int soca=0;
 float initialx=0;
 //controla movimento inimigo
 bool moveI = true;
+bool podeGirar = true;
 //controla soco do inimigo
 float incSocoAcc = 0;
 int socoDirection = 0;
@@ -74,7 +75,6 @@ void renderScene(){
         jogador.Desenha();
     }
     if(inimigo.validBoxer()){
-        GLfloat cxjogador,cyjogador;
         inimigo.Desenha();
     }
     GLdouble largura,altura;
@@ -84,7 +84,7 @@ void renderScene(){
     imprimePlacar(x+largura/12,y+altura/12,altura/18);
     if(fim){
         float xposition,yposition;
-        xposition = x+largura/2;
+        xposition = x+largura/2.0f;
         yposition = y+altura*4/5;
         //Escreve mensagem de vitoria
         if(jogador.validBoxer()){
@@ -218,6 +218,7 @@ void idle(){
             inimigo.retornaAnguloRelativoAoJogador(cxjogador,cyjogador,theta);
             GLfloat anguloAtual = inimigo.returnAngle();
             GLfloat angleDiference = anguloAtual-theta;
+            static float oldT = theta;
             GLfloat dist = inimigo.distanceAoJogadorF(inc_anda,timeDiference,cxjogador,cyjogador,raiojogador);
             GLfloat raioI; 
             inimigo.obtemRaioImaginary(raioI);
@@ -232,17 +233,24 @@ void idle(){
                 moveI = false;
                 inimigo.defineValidSoco(true);
             }
-            if(angleDiference<0){
+            if(oldT!=theta){
+                podeGirar = true;
+            }
+            if(angleDiference<0 && podeGirar){
+                podeGirar = false;
                 if((anguloAtual+inc_giro)<theta){
                     inimigo.Gira(inc_giro,timeDiference);
                 }
             }
-            else if(angleDiference>0){
+            else if(angleDiference>0 && podeGirar){
+                podeGirar = false;
                 if((anguloAtual-inc_giro)>theta){
                     inimigo.Gira(-inc_giro,timeDiference);
                 }
             }
+
             //Define a memoria de theta passado
+            oldT = theta;
             if(moveI){
                 inimigo.Move(inc_anda,timeDiference,limitesquerda,limitdireita,limitcima,limitbaixo,
                             cxjogador,cyjogador,raiojogador);
@@ -251,7 +259,7 @@ void idle(){
             if(inimigo.returnValidSoco()){
                 GLdouble largura,altura;
                 arena.obtemAlturaLargura(largura,altura);
-                float incsoco = (max_angle_soca)/(largura/2)*timeDiference*1.25;
+                float incsoco = (max_angle_soca)/(360.0f)*timeDiference*1.5;
                 
                 if(!socoDirection){
                     socoDirection = rand()%2+1;
