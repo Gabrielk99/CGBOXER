@@ -210,98 +210,98 @@ void idle(){
 
 
         //Movimento do inimigo
-            GLfloat cxjogador,cyjogador;
-            jogador.obtemcXcY(cxjogador,cyjogador);
-            GLfloat raiojogador;
-            jogador.obtemRaio(raiojogador);
-            GLfloat theta=0;
-            inimigo.retornaAnguloRelativoAoJogador(cxjogador,cyjogador,theta);
-            GLfloat anguloAtual = inimigo.returnAngle();
-            GLfloat angleDiference = anguloAtual-theta;
-            static float oldT = theta;
-            GLfloat dist = inimigo.distanceAoJogadorF(inc_anda,timeDiference,cxjogador,cyjogador,raiojogador);
-            GLfloat raioI; 
-            inimigo.obtemRaioImaginary(raioI);
+        GLfloat cxjogador,cyjogador;
+        jogador.obtemcXcY(cxjogador,cyjogador);
+        GLfloat raiojogador;
+        jogador.obtemRaio(raiojogador);
+        GLfloat theta=0;
+        inimigo.retornaAnguloRelativoAoJogador(cxjogador,cyjogador,theta);
+        GLfloat anguloAtual = inimigo.returnAngle();
+        GLfloat angleDiference = anguloAtual-theta;
+        static float oldT = theta;
+        GLfloat dist = inimigo.distanceAoJogadorF(inc_anda,timeDiference,cxjogador,cyjogador,raiojogador);
+        GLfloat raioI; 
+        inimigo.obtemRaioImaginary(raioI);
 
-            if((raioI+raiojogador)<dist){
-                inimigo.defineValidSoco(false);
-                if((dist-(raioI+raiojogador))>100 || (!keyStatus[(int)('w')] && !keyStatus[(int)('s')]) ){
-                    moveI = true;
-                }
+        if((raioI+raiojogador)<dist){
+            inimigo.defineValidSoco(false);
+            if((dist-(raioI+raiojogador))>100 || (!keyStatus[(int)('w')] && !keyStatus[(int)('s')]) ){
+                moveI = true;
             }
-            else {
-                moveI = false;
-                inimigo.defineValidSoco(true);
+        }
+        else {
+            moveI = false;
+            inimigo.defineValidSoco(true);
+        }
+        if(oldT!=theta){
+            podeGirar = true;
+        }
+        if(angleDiference<0 && podeGirar){
+            podeGirar = false;
+            if((anguloAtual+inc_giro)<theta){
+                inimigo.Gira(inc_giro,timeDiference);
             }
-            if(oldT!=theta){
-                podeGirar = true;
+        }
+        else if(angleDiference>0 && podeGirar){
+            podeGirar = false;
+            if((anguloAtual-inc_giro)>theta){
+                inimigo.Gira(-inc_giro,timeDiference);
             }
-            if(angleDiference<0 && podeGirar){
-                podeGirar = false;
-                if((anguloAtual+inc_giro)<theta){
-                    inimigo.Gira(inc_giro,timeDiference);
-                }
-            }
-            else if(angleDiference>0 && podeGirar){
-                podeGirar = false;
-                if((anguloAtual-inc_giro)>theta){
-                    inimigo.Gira(-inc_giro,timeDiference);
-                }
-            }
+        }
 
-            //Define a memoria de theta passado
-            oldT = theta;
-            if(moveI){
-                inimigo.Move(inc_anda,timeDiference,limitesquerda,limitdireita,limitcima,limitbaixo,
-                            cxjogador,cyjogador,raiojogador);
+        //Define a memoria de theta passado
+        oldT = theta;
+        if(moveI){
+            inimigo.Move(inc_anda,timeDiference,limitesquerda,limitdireita,limitcima,limitbaixo,
+                        cxjogador,cyjogador,raiojogador);
+        }
+        //Soca Inimigo
+        if(inimigo.returnValidSoco()){
+            GLdouble largura,altura;
+            arena.obtemAlturaLargura(largura,altura);
+            float incsoco = (max_angle_soca)/(360.0f)*timeDiference*1.5;
+            
+            if(!socoDirection){
+                socoDirection = rand()%2+1;
             }
-            //Soca Inimigo
-            if(inimigo.returnValidSoco()){
-                GLdouble largura,altura;
-                arena.obtemAlturaLargura(largura,altura);
-                float incsoco = (max_angle_soca)/(360.0f)*timeDiference*1.5;
-                
-                if(!socoDirection){
+            switch (socoDirection)
+            {
+            case 1:
+                if(!finalizousoco && incSocoAcc<max_angle_soca){
+                    incSocoAcc+=incsoco;
+                    inimigo.socoDireito(incSocoAcc,raiojogador,cxjogador,cyjogador);
+                }
+                else if(incSocoAcc>0) {
+                    finalizousoco = true;
+                    incSocoAcc-= incsoco;
+                    inimigo.socoDireito(incSocoAcc,raiojogador,cxjogador,cyjogador);
+                }
+                else {
+                    finalizousoco=false;
+                    incSocoAcc = 0;
                     socoDirection = rand()%2+1;
                 }
-                switch (socoDirection)
-                {
-                case 1:
-                    if(!finalizousoco && incSocoAcc<max_angle_soca){
-                        incSocoAcc+=incsoco;
-                        inimigo.socoDireito(incSocoAcc,raiojogador,cxjogador,cyjogador);
-                    }
-                    else if(incSocoAcc>0) {
-                        finalizousoco = true;
-                        incSocoAcc-= incsoco;
-                        inimigo.socoDireito(incSocoAcc,raiojogador,cxjogador,cyjogador);
-                    }
-                    else {
-                        finalizousoco=false;
-                        incSocoAcc = 0;
-                        socoDirection = rand()%2+1;
-                    }
-                    break;
-                case 2:
-                    if(!finalizousoco && incSocoAcc>-max_angle_soca){
-                        incSocoAcc-=incsoco;
-                        inimigo.socoEsquerdo(incSocoAcc,raiojogador,cxjogador,cyjogador);
-                    }
-                    else if(incSocoAcc<0) {
-                        finalizousoco = true;
-                        incSocoAcc+= incsoco;
-                        inimigo.socoEsquerdo(incSocoAcc,raiojogador,cxjogador,cyjogador);
-                    }
-                    else {
-                        incSocoAcc = 0;
-                        socoDirection = rand()%2+1;
-                        finalizousoco=false;
-                    }
-                    break;
-                default:
-                    break;
+                break;
+            case 2:
+                if(!finalizousoco && incSocoAcc>-max_angle_soca){
+                    incSocoAcc-=incsoco;
+                    inimigo.socoEsquerdo(incSocoAcc,raiojogador,cxjogador,cyjogador);
                 }
+                else if(incSocoAcc<0) {
+                    finalizousoco = true;
+                    incSocoAcc+= incsoco;
+                    inimigo.socoEsquerdo(incSocoAcc,raiojogador,cxjogador,cyjogador);
+                }
+                else {
+                    incSocoAcc = 0;
+                    socoDirection = rand()%2+1;
+                    finalizousoco=false;
+                }
+                break;
+            default:
+                break;
             }
+        }
     }
     glutPostRedisplay();
 }
