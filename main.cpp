@@ -217,12 +217,11 @@ void idle(){
         GLfloat theta=0;
         inimigo.retornaAnguloRelativoAoJogador(cxjogador,cyjogador,theta);
         GLfloat anguloAtual = inimigo.returnAngle();
-        GLfloat angleDiference = anguloAtual-theta;
-        static float oldT = theta;
+        GLfloat angleDiference = theta-anguloAtual;
         GLfloat dist = inimigo.distanceAoJogadorF(inc_anda,timeDiference,cxjogador,cyjogador,raiojogador);
         GLfloat raioI; 
         inimigo.obtemRaioImaginary(raioI);
-
+        //decide se o inimigo pode mover ou socar
         if((raioI+raiojogador)<dist){
             inimigo.defineValidSoco(false);
             if((dist-(raioI+raiojogador))>100 || (!keyStatus[(int)('w')] && !keyStatus[(int)('s')]) ){
@@ -233,24 +232,21 @@ void idle(){
             moveI = false;
             inimigo.defineValidSoco(true);
         }
-        if(oldT!=theta){
-            podeGirar = true;
-        }
-        if(angleDiference<0 && podeGirar){
-            podeGirar = false;
-            if((anguloAtual+inc_giro)<theta){
+        //calculando o angulo compensador
+        angleDiference = atan2(sin(angleDiference),cos(angleDiference));
+        //transformando em radianos pois theta e angulo atual ta em radianos
+        float inc_giro_r = inc_giro*M_PI/180;
+        if(angleDiference<0){
+            if(anguloAtual-inc_giro_r*timeDiference>(anguloAtual+angleDiference)){
+                inimigo.Gira(-inc_giro,timeDiference);
+            }
+        } 
+        else if (angleDiference>0){
+            if(anguloAtual+inc_giro_r*timeDiference<(anguloAtual+angleDiference)){
                 inimigo.Gira(inc_giro,timeDiference);
             }
         }
-        else if(angleDiference>0 && podeGirar){
-            podeGirar = false;
-            if((anguloAtual-inc_giro)>theta){
-                inimigo.Gira(-inc_giro,timeDiference);
-            }
-        }
-
-        //Define a memoria de theta passado
-        oldT = theta;
+  
         if(moveI){
             inimigo.Move(inc_anda,timeDiference,limitesquerda,limitdireita,limitcima,limitbaixo,
                         cxjogador,cyjogador,raiojogador);
