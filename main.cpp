@@ -376,15 +376,17 @@ void idle(){
                 case 1:
                     //enquanto não tiver finalizado o soco e o angulo de soco
                     // for menor que o max permitido
-                    if(!finalizousoco && incSocoAcc<=max_angle_soca){
+                    if(!finalizousoco && incSocoAcc<max_angle_soca){
                         incSocoAcc+=incsoco;
                         inimigo.socoDireito(incSocoAcc,raiojogador,cxjogador,cyjogador);
+                        if(incSocoAcc>=max_angle_soca){
+                            finalizousoco=true;
+                        }
                     }
                     //enquanto incSocoAcc for maior do que zero
                     //retorne o soco para a posição inicial
                     //decrementando o acumulador
-                    else if(incSocoAcc>0) {
-                        finalizousoco = true;
+                    else if(incSocoAcc>0 && finalizousoco) {
                         incSocoAcc-= incsoco;
                         inimigo.socoDireito(incSocoAcc,raiojogador,cxjogador,cyjogador);
                     }
@@ -400,13 +402,15 @@ void idle(){
                 case 2:
                     //Mesma situação enquanto não finalizar o soco
                     // e enquanto for maior que o -angulo maximo
-                    if(!finalizousoco && incSocoAcc>=-max_angle_soca){
+                    if(!finalizousoco && incSocoAcc>-max_angle_soca){
                         incSocoAcc-=incsoco;
                         inimigo.socoEsquerdo(incSocoAcc,raiojogador,cxjogador,cyjogador);
+                        if(incSocoAcc<=-max_angle_soca){
+                            finalizousoco=true;
+                        }
                     }
                     //incrementa para retornar a posição original
-                    else if(incSocoAcc<0) {
-                        finalizousoco = true;
+                    else if(incSocoAcc<0 && finalizousoco) {
                         incSocoAcc+= incsoco;
                         inimigo.socoEsquerdo(incSocoAcc,raiojogador,cxjogador,cyjogador);
                     }
