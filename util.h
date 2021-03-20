@@ -6,13 +6,19 @@
 #include "arena.h"
 #include "jogador.h"
 #include "inimigo.h"
+//invocando o tinyxml2 para leituras do svg
 using namespace tinyxml2;
 using namespace std;
+//Classe util para leitura e inicialização dos objetos
 class Util
 {
+    //nome do SVG
     string svgfilename;
+    //doc de leitura do svg
     XMLDocument doc;
+    //elemento raiz
     XMLElement*  root;
+    //verificação de erro
     XMLError lido;
 private:
   
