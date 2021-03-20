@@ -1,0 +1,28 @@
+CC = g++
+CFLAGS = -lGL\
+		 -lGLU\
+		 -lglut
+#.cpp files
+CPP_SOURCE = $(wildcard *.cpp)
+# .h files
+H_SOURCE = $(wildcard *.h)
+#Object files
+OBJ = $(CPP_SOURCE:.cpp=.o)
+
+all: trabalhocg
+
+trabalhocg: $(OBJ)
+	$(CC) -o  $@ $^
+
+%.o: %.cpp %.h
+	$(CC) -o $@ $^
+
+main.o: main.c $(H_SOURCE)
+	$(CC) -o $ @ $< $(CFLAGS)
+
+clean:
+	rm -rf *.o trabalhocg
+
+#inimigo.o: inimigo.cpp inimigo.h
+#	$(CC) -o inimigo.cpp -inimigo.h -cpp
+
