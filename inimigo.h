@@ -21,6 +21,7 @@ public:
     };
     //permite definir o objeto sem inicializar
     Inimigo(){};
+ 
     //calcula o angulo do nariz inimigo (direção inicial do inimigo)
     void calculeAnlgeNarizInimigo(GLfloat cxjogador,GLfloat cyjogador){
         GLfloat theta;

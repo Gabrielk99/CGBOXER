@@ -41,6 +41,10 @@ class Boxer
     bool pontuationValid = true;
     //se o jogador pode socar
     bool socoValid = true;
+    //apenas um roubo, quero que o soco colida com o personagem
+    //sem atravessar a cabeça, se eu deixa fluir a posição futura ao menos
+    //uma vez, o soco colide sem atravessar e sem não encostar
+    bool avançaUltimaPosixSoco = true;
 
 private:
     //auxiliares de desenho do personagem
@@ -87,6 +91,10 @@ public:
     //define o angulo do personagem
     void defineAngle(GLfloat theta){
         angle = theta;
+    }
+    // redefine o cy do personagem para o eixo ideal
+    void redefinecy(GLdouble altura,GLfloat y){
+        cY= y+(altura+y)-cY;
     }
     //funções de movimento e soco
     void Gira(GLdouble inc,GLdouble time);

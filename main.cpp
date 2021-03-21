@@ -362,7 +362,7 @@ void idle(){
             if(inimigo.returnValidSoco()){
                 GLdouble largura,altura;
                 arena.obtemAlturaLargura(largura,altura);
-                float incsoco = (max_angle_soca)/(360.0f)*timeDiference*1.5;
+                float incsoco = (max_angle_soca-5)/(360.0f)*timeDiference*1.5;
                 
                 //socoDirection começa como zero
                 //sorteia para decidir o primeiro braço a socar  

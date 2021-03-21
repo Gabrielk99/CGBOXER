@@ -210,10 +210,18 @@ void Boxer::socoDireito(GLfloat inc,GLfloat raioadversario,GLfloat cx,GLfloat cy
         anglebraco22=anglebraco22_inicial -0.75*inc; 
         //primeira colisão define como valida a pontuação
         pontuationValid=true;
+        //define que pode avançar mais uma posição
+        avançaUltimaPosixSoco = true;
       
     }
     //se colidiu então 
     else{
+        if(avançaUltimaPosixSoco){
+            // define os angulos de soco
+            anglebraco21=anglebraco21_inicial + inc;
+            anglebraco22=anglebraco22_inicial -0.75*inc; 
+            avançaUltimaPosixSoco = false;
+        }
         //verifica se pode pontuar se sim pontua
        if(pontuationValid){
             pontuation++;
@@ -244,10 +252,17 @@ void  Boxer :: socoEsquerdo(GLfloat inc,GLfloat raioadversario,GLfloat cx,GLfloa
         anglebraco11 = anglebraco11_inicial + inc;
         anglebraco12 = anglebraco12_inicial - 0.75*inc;
         pontuationValid=true;
+        avançaUltimaPosixSoco = true;
     }
     //pontuar quando valido
     else {
-      if(pontuationValid){
+        if(avançaUltimaPosixSoco){
+            // define os angulos de soco
+            anglebraco11=anglebraco11_inicial + inc;
+            anglebraco12=anglebraco12_inicial -0.75*inc; 
+            avançaUltimaPosixSoco = false;
+        }
+        if(pontuationValid){
             pontuation++;
             pontuationValid = false;
         }

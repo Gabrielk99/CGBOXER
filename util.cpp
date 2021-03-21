@@ -26,6 +26,15 @@ void Util :: parsesElements(Arena &arena,Inimigo &inimigo,Jogador &jogador){
     }
     //limpa o doc
     doc.Clear();
+   
+    //pega altura e largura da arena
+    GLdouble altura,largura;
+    GLfloat x,y;
+    arena.obtemAlturaLargura(largura,altura);
+    arena.ObtemOrigem(x,y);
+    jogador.redefinecy(altura,y);
+    inimigo.redefinecy(altura,y);
+    
     //pega o centro do inimigo e acha o angulo de direção do jogador ao inimigo
     GLfloat cx, cy;
     inimigo.obtemcXcY(cx,cy);

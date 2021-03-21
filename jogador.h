@@ -33,6 +33,7 @@ public:
        float theta = atan2(disty,distx);
        Boxer::defineAngle(theta);
     }
+
 };
 
 
