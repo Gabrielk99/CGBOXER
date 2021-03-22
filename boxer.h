@@ -44,7 +44,7 @@ class Boxer
     //apenas um roubo, quero que o soco colida com o personagem
     //sem atravessar a cabeça, se eu deixa fluir a posição futura ao menos
     //uma vez, o soco colide sem atravessar e sem não encostar
-    bool avançaUltimaPosixSoco = true;
+    bool avancaUltimaPosixSoco = true;
 
 private:
     //auxiliares de desenho do personagem

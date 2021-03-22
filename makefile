@@ -5,7 +5,7 @@ CFLAGS =-lGL\
 
 all: trabalhocg
 
-trabalhocg: *.o
+trabalhocg: 
 	$(CC) -o  trabalhocg *.cpp $(CFLAGS)
 clean:
-	rm -rf *.o trabalhocg
+	rm -rf  trabalhocg
