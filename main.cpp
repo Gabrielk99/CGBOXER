@@ -323,7 +323,7 @@ void idle(){
             if((raioI+raiojogador)<dist){
                 //se não houve colisão movimenta-se
                 inimigo.defineValidSoco(false);
-               //Se o jogador tiver a uma distancia segura de 100 pixels
+               //Se o jogador tiver a uma distancia segura de raioI do inimigo pixels
                //ativa o movimento do inimigo
                //o inimigo vai movimentar quando o jogador não andar para frente e para tras
                 if((dist-(raioI+raiojogador))>raioI || (!keyStatus[(int)('w')] && !keyStatus[(int)('s')]) ){
