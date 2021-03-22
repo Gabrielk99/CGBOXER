@@ -252,15 +252,15 @@ void  Boxer :: socoEsquerdo(GLfloat inc,GLfloat raioadversario,GLfloat cx,GLfloa
         anglebraco11 = anglebraco11_inicial + inc;
         anglebraco12 = anglebraco12_inicial - 0.75*inc;
         pontuationValid=true;
-        avançaUltimaPosixSoco = true;
+        avancaUltimaPosixSoco = true;
     }
     //pontuar quando valido
     else {
-        if(avançaUltimaPosixSoco){
+        if(avancaUltimaPosixSoco){
             // define os angulos de soco
             anglebraco11=anglebraco11_inicial + inc;
             anglebraco12=anglebraco12_inicial -0.75*inc; 
-            avançaUltimaPosixSoco = false;
+            avancaUltimaPosixSoco = false;
         }
         if(pontuationValid){
             pontuation++;
