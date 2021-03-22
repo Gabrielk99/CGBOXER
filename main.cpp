@@ -326,7 +326,7 @@ void idle(){
                //Se o jogador tiver a uma distancia segura de 100 pixels
                //ativa o movimento do inimigo
                //o inimigo vai movimentar quando o jogador não andar para frente e para tras
-                if((dist-(raioI+raiojogador))>100 || (!keyStatus[(int)('w')] && !keyStatus[(int)('s')]) ){
+                if((dist-(raioI+raiojogador))>raioI || (!keyStatus[(int)('w')] && !keyStatus[(int)('s')]) ){
                     moveI = true;
                 }
             }
