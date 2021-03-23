@@ -204,7 +204,29 @@ void mouseMotion(int x,int y){
 void keyPress(unsigned char key,int x,int y){
    //sempre que pressionar uma tecla será atribuido 1
    //as suas variaveis de estado
-   keyStatus[key]=1;
+   switch (key)
+   {
+   case 'a':
+   case 'A':
+       keyStatus[(int)('a')] = 1;
+       break;
+   case 'd':
+   case 'D':
+        keyStatus[(int)('d')]=1;
+        break;
+    case 's':
+    case 'S':
+        keyStatus[(int)('s')]=1;
+        break;
+    case 'w':
+    case 'W':
+        keyStatus[(int)('w')]=1;
+        break;
+   default:
+        keyStatus[key]=1;
+       break;
+   }
+   
    //se qualquer uma das teclas de movimento for pressionada 
    //o jogador não pode socar
     if(keyStatus[(int)('a')]||keyStatus[(int)('d')]||keyStatus[(int)('w')]
@@ -226,7 +248,28 @@ void keyPress(unsigned char key,int x,int y){
 void keyUp(unsigned char key, int x,int y){
     //se soltado a tecla atribui 0 a variável
     //de estado
-    keyStatus[key]=0;
+     switch (key)
+   {
+   case 'a':
+   case 'A':
+       keyStatus[(int)('a')] = 0;
+       break;
+   case 'd':
+   case 'D':
+        keyStatus[(int)('d')]=0;
+        break;
+    case 's':
+    case 'S':
+        keyStatus[(int)('s')]=0;
+        break;
+    case 'w':
+    case 'W':
+        keyStatus[(int)('w')]=0;
+        break;
+   default:
+        keyStatus[key]=0;
+       break;
+   }
     //verifica se todas as teclas são soltas 
     // se sim o jogador está parado e pode socar
      if(!keyStatus[(int)('a')] && !keyStatus[(int)('d')] && !keyStatus[(int)('w')]
