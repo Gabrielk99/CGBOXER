@@ -328,6 +328,7 @@ void idle(){
                //o inimigo vai movimentar quando o jogador não andar para frente e para tras
                 if((dist-(raioI+raiojogador))>raioI || (!keyStatus[(int)('w')] && !keyStatus[(int)('s')]) ){
                     moveI = true;
+                    incSocoAcc = 0;
                 }
             }
             //se houve colisão o inimigo chegou ao jogador
@@ -343,18 +344,18 @@ void idle(){
             //se o angulo que compensa girar é negativo
             //decrementa o angulo atual
             if(angleDiference<0){
-                if(anguloAtual-inc_giro_r*timeDiference>(anguloAtual+angleDiference)){
+                if((anguloAtual-inc_giro_r*timeDiference)>(anguloAtual+angleDiference)){
                     inimigo.Gira(-inc_giro,timeDiference);
                 }
             } 
             //se não incrementa
             else if (angleDiference>0){
-                if(anguloAtual+inc_giro_r*timeDiference<(anguloAtual+angleDiference)){
+                if((anguloAtual+inc_giro_r*timeDiference)<(anguloAtual+angleDiference)){
                     inimigo.Gira(inc_giro,timeDiference);
                 }
             }
             //se o nimigo pode mover, então mova-se
-            if(moveI){
+           if(moveI){
                 inimigo.Move(inc_anda,timeDiference,limitesquerda,limitdireita,limitcima,limitbaixo,
                             cxjogador,cyjogador,raiojogador);
             }
